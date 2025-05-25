@@ -36,7 +36,7 @@ class PhishingApi(Resource):
         args = parser.parse_args()
         
         result = predict_proba(
-            title=args['tile'],
+            title=args['title'],
             plot=args['plot'],
 
         )
