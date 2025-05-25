@@ -5,7 +5,7 @@ import joblib
 import sys
 import os
 
-from sklearn.feature_extraction.text import CountVectorizer
+
 
 class CountVectorizerEmbedder:
     def __init__(self, model_path='vectorizer.joblib'):
