@@ -32,7 +32,18 @@ def predict_proba(title:str, plot:str):
     # Make prediction
     p1 = model.predict(text_vec)
 
-    return p1
+    # Paso 1: Convertir probabilidades a 0s y 1s (puedes ajustar el umbral si es necesario)
+    y_pred_bin = (p1 >= 0.4).astype(int)
+
+
+    # Paso 2: Obtener los géneros con el binarizador original
+    # Carga el binarizador previamente guardado
+    mlb = joblib.load('mlb_encoder.pkl')
+
+    # Supongamos que y_pred_bin es la predicción binarizada del modelo
+    predicted_genres = mlb.inverse_transform(y_pred_bin)
+
+    return predicted_genres
 
 
 if __name__ == "__main__":
@@ -44,20 +55,8 @@ if __name__ == "__main__":
         title = sys.argv[1]
         plot = sys.argv[2]
 
-        p1 = predict_proba(title, plot)
+        predicted_genres = predict_proba(title, plot)
 
-        # Paso 1: Convertir probabilidades a 0s y 1s (puedes ajustar el umbral si es necesario)
-        y_pred_bin = (p1 >= 0.4).astype(int)
-
-
-        # Paso 2: Obtener los géneros con el binarizador original
-        # Carga el binarizador previamente guardado
-        mlb = joblib.load('mlb_encoder.pkl')
-
-        # Supongamos que y_pred_bin es la predicción binarizada del modelo
-        predicted_genres = mlb.inverse_transform(y_pred_bin)
-
-        
         #print('El género de la pelicula es: ', predicted_genres)
         print('El género de la pelicula es: ', predicted_genres)
         
