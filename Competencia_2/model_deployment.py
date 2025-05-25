@@ -4,18 +4,15 @@ import pandas as pd
 import joblib
 import sys
 import os
+
 from sklearn.feature_extraction.text import CountVectorizer
 
 class CountVectorizerEmbedder:
-    def __init__(self, max_features=1000):
-        self.vectorizer = CountVectorizer(max_features=max_features)
-
-    def fit(self, texts):
-        self.vectorizer.fit(texts)
+    def __init__(self, model_path='vectorizer.joblib'):
+        self.vectorizer = joblib.load(model_path)
 
     def transform(self, texts):
         return self.vectorizer.transform(texts).toarray()
-
 
 
 def predict_proba(title:str, plot:str):
@@ -29,7 +26,6 @@ def predict_proba(title:str, plot:str):
     
     df = pd.DataFrame(input_data)
     df['text'] = df['title'] + ' ' + df['plot']
-
     vectorizer = CountVectorizerEmbedder()
     text_vec = vectorizer.transform(df['text'])
     
