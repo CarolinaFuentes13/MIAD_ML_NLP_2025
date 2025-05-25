@@ -4,30 +4,17 @@ import pandas as pd
 import joblib
 import sys
 import os
-import numpy as np
-import torch
-from transformers import DistilBertTokenizer, DistilBertModel
-from tqdm import tqdm
-from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.feature_extraction.text import CountVectorizer
 
-# ---------- BERT Vectorizer ----------
-class BERTVectorizer:
-    def __init__(self, model_name='distilbert-base-uncased', max_length=256):
-        self.tokenizer = DistilBertTokenizer.from_pretrained(model_name)
-        self.model = DistilBertModel.from_pretrained(model_name)
-        self.max_length = max_length
-        self.model.eval()
+class CountVectorizerEmbedder:
+    def __init__(self, max_features=1000):
+        self.vectorizer = CountVectorizer(max_features=max_features)
+
+    def fit(self, texts):
+        self.vectorizer.fit(texts)
 
     def transform(self, texts):
-        embeddings = []
-        with torch.no_grad():
-            for text in tqdm(texts, desc="Generando embeddings BERT"):
-                inputs = self.tokenizer(text, return_tensors="pt", padding="max_length",
-                                        truncation=True, max_length=self.max_length)
-                outputs = self.model(**inputs)
-                cls_embedding = outputs.last_hidden_state[:, 0, :].squeeze().numpy()
-                embeddings.append(cls_embedding)
-        return np.array(embeddings)
+        return self.vectorizer.transform(texts).toarray()
 
 
 
@@ -43,7 +30,7 @@ def predict_proba(title:str, plot:str):
     df = pd.DataFrame(input_data)
     df['text'] = df['title'] + ' ' + df['plot']
 
-    vectorizer = BERTVectorizer()
+    vectorizer = CountVectorizerEmbedder()
     text_vec = vectorizer.transform(df['text'])
     
     # Make prediction
